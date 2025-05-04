@@ -1,0 +1,40 @@
+# Create machines
+mach create "machine0"
+mach create "machine1"
+
+# Load platforms
+mach set "machine0"
+machine LoadPlatformDescription @machine0.repl
+#sysbus.cpu LogFunctionNames true
+
+sysbus LoadELF @CAN_PROTOCOL_TESTING_TX.elf
+
+mach set "machine1"
+machine LoadPlatformDescription @machine1.repl
+#sysbus.cpu LogFunctionNames true
+
+sysbus LoadELF @CAN_PROTOCOL_TESTING_RX.elf
+
+
+
+# Create CAN Hub
+emulation CreateCANHub "canHub"
+
+# Connect both machines to CAN Hub
+mach set "machine0"
+connector Connect sysbus.can0 canHub
+
+showAnalyzer sysbus.usart2
+
+mach set "machine1"
+connector Connect sysbus.can1 canHub
+
+# open a terminal to display UART data
+showAnalyzer sysbus.usart1
+
+# Start both machines
+mach set "machine0"
+start
+
+mach set "machine1"
+start
